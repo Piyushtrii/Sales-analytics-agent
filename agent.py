@@ -1,11 +1,9 @@
-# app.py - COMPLETE DEPLOYMENT READY VERSION
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 from groq import Groq
 import os
 
-# Streamlit Cloud optimized API key handling
 @st.cache_resource
 def get_groq_client():
     API_KEY = (
@@ -31,10 +29,10 @@ def load_data():
     contacts = pd.read_csv("contacts.csv")
     tasks = pd.read_csv("tasks.csv")
     
-    # Standardize accounts
+    #Standardize accounts
     accounts = accounts.rename(columns={"ID": "account_id", "NAME": "account_name"})
     
-    # Standardize opportunities
+    #Standardize opportunities
     opportunities = opportunities.rename(columns={
         "ID": "opportunity_id", "ACCOUNT_ID": "account_id", "AMOUNT": "amount",
         "PROBABILITY": "probability", "STAGE_NAME": "stage", "CLOSE_DATE": "close_date"
@@ -42,13 +40,13 @@ def load_data():
     opportunities["close_date"] = pd.to_datetime(opportunities["close_date"])
     opportunities = opportunities.merge(accounts[["account_id", "account_name"]], on="account_id", how="left")
     
-    # Standardize contacts
+    #Standardize contacts
     contacts = contacts.rename(columns={
         "ID": "contact_id", "ACCOUNT_ID": "account_id", "NAME": "contact_name", "EMAIL": "email"
     })
     contacts = contacts.merge(accounts[["account_id", "account_name"]], on="account_id", how="left")
     
-    # Standardize tasks
+    #Standardize tasks
     if "ACCOUNT_ID" in tasks.columns:
         tasks = tasks.rename(columns={"ACCOUNT_ID": "account_id"})
     if "ACTIVITY_DATE" in tasks.columns:
@@ -58,7 +56,7 @@ def load_data():
     
     return accounts, contacts, opportunities, tasks
 
-# Load data
+#loading data
 accounts_df, contacts_df, opps_df, tasks_df = load_data()
 client = get_groq_client()
 
@@ -75,16 +73,14 @@ def ask_ai(prompt: str) -> str:
     except Exception as e:
         return f"AI Error: {str(e)}"
 
-# Header
+
 st.markdown("""
 #AI Sales Analytics
 """)
 
-# Tabs
 tabs = st.tabs(["📊 Dashboard", "🤖 AI Assistant", "🤝 Meeting Prep", "📧 Outreach Generator"])
 
 with tabs[0]:
-    # Calculate metrics (avoid modifying cached data)
     weighted_df = opps_df.copy()
     weighted_df["weighted_amount"] = weighted_df["amount"] * (weighted_df["probability"] / 100)
     
@@ -93,7 +89,7 @@ with tabs[0]:
     col2.metric("Weighted Pipeline", f"€{weighted_df['weighted_amount'].sum():,.0f}")
     col3.metric("Active Deals", len(opps_df))
     
-    # Stage chart
+    #Stage chart
     stage_summary = opps_df.groupby("stage")["amount"].sum().reset_index()
     st.plotly_chart(
         px.bar(stage_summary, x="stage", y="amount", 
@@ -177,6 +173,7 @@ with tabs[3]:
             From: Your Name, Sales Manager at Your Company
             """)
             st.text_area("Generated Email", email, height=300, key="email_output")
+
 
 
 

@@ -66,7 +66,7 @@ def ask_ai(prompt: str) -> str:
     """Query Groq AI with error handling"""
     try:
         response = client.chat.completions.create(
-            model="llama-3.1-70b-versatile",  # ✅ VALID GROQ MODEL
+            model="openai/gpt-oss-120b",  
             messages=[{"role": "user", "content": prompt}],
             temperature=0.4,
             max_tokens=1000
@@ -77,8 +77,7 @@ def ask_ai(prompt: str) -> str:
 
 # Header
 st.markdown("""
-# 🚀 AI Sales Analytics
-**Salesforce Data • Streamlit • Groq Llama 3.1**
+#AI Sales Analytics
 """)
 
 # Tabs
@@ -179,5 +178,5 @@ with tabs[3]:
             """)
             st.text_area("Generated Email", email, height=300, key="email_output")
 
-st.markdown("---")
-st.markdown("*Powered by Streamlit + Groq Llama 3.1*")
+
+
